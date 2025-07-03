@@ -44,7 +44,7 @@ void TuningFrequency::configure() {
 }
 
 void TuningFrequency::reset() {
-  int size = (int)(100.0/_resolution);
+  int size = static_cast<int>(100.0/_resolution);
   _histogram = vector<Real>(size, 0.0);
   _globalHistogram = vector<Real>(size, 0.0);
 }
@@ -54,7 +54,7 @@ Real TuningFrequency::currentTuningCents() const {
 
   // if we have an empty histogram (ie: no estimates atm), start with a default
   // value of everything is tuned correctly
-  if (_globalHistogram[globalIndex] == (Real)0.0) {
+  if (_globalHistogram[globalIndex] == 0.0) {
     return 0.0;
   }
 
@@ -79,7 +79,7 @@ void TuningFrequency::updateOutputs() {
 
 
 Real TuningFrequency::tuningFrequencyFromCents(Real cents) const {
-  return 440.0*pow((Real)2.0, (Real)(cents/1200.0));
+  return 440.0*pow(static_cast<Real>(2.0), static_cast<Real>(cents/1200.0));
 }
 
 
@@ -98,13 +98,13 @@ void TuningFrequency::compute() {
   }
 
   // the frame histogram is reset every frame...
-  fill(_histogram.begin(), _histogram.end(), (Real) 0.0);
+  fill(_histogram.begin(), _histogram.end(), 0.0);
 
   // the peak energy
-  Real frame_energy = (Real)0.0;
+  Real frame_energy = 0.0;
 
   // Compute histogram with arbitrary cents resolution
-  for (int i=0; i<(int)magnitudes.size(); i++) {
+  for (size_t i=0; i<magnitudes.size(); i++) {
     if (frequencies[i] <= 0.0) {
       continue;
     }
@@ -112,9 +112,9 @@ void TuningFrequency::compute() {
     Real octave = log2(frequencies[i]/440.0);
     Real note = octave*12.f;
     Real deviationInCents = 100.0*(note - floor(note + 0.5));
-    int index = int((50. + deviationInCents) / _resolution + 0.5);
+    int index = static_cast<int>((50. + deviationInCents) / _resolution + 0.5);
 
-    if (index == int(_histogram.size())) {
+    if (index == static_cast<int>(_histogram.size())) {
       index = 0;
     }
     //if (index >= (int)_histogram.size() || index < 0) { // this case will never occur
@@ -135,9 +135,9 @@ void TuningFrequency::compute() {
   // Compute 'global' maximum histogram value, i.e. the sum of all!
   // this is a bit strange, as we only want the "last" value that is
   // computed.
-  int globalHistogramIndex = (int) ((50.0+frameTuning)/_resolution+0.5);
+  int globalHistogramIndex = static_cast<int>((50.0+frameTuning)/_resolution+0.5);
 
-  if (globalHistogramIndex == (int)_globalHistogram.size()) {
+  if (globalHistogramIndex == static_cast<int>(_globalHistogram.size())) {
     globalHistogramIndex = 0;
   }
   _globalHistogram[globalHistogramIndex] += frame_energy;

@@ -19,14 +19,6 @@
 
 #include <Python.h>
 
-// defined only in python 2.4, make it available for 2.3 as well
-#ifndef Py_RETURN_TRUE
-#define Py_RETURN_TRUE return Py_INCREF(Py_True), Py_True
-#endif
-#ifndef Py_RETURN_FALSE
-#define Py_RETURN_FALSE return Py_INCREF(Py_False), Py_False
-#endif
-
 // numpy import
 #define PY_ARRAY_UNIQUE_SYMBOL PyArray_API
 #include "numpy/arrayobject.h"
@@ -77,26 +69,13 @@ init_essentia() {
       PyType_Ready(&VectorVectorStereoSampleType) < 0) {
 
     cerr << "Unable to instantiate Essentia's wrapper types." << endl;
-#if PY_MAJOR_VERSION >= 3
     return NULL;
-#else
-    return;
-#endif
   }
 
   // import the NumPy C api
-  int numpy_error = _import_array();
-  if (numpy_error) {
-    cerr << "Unable to import NumPy C API from Essentia module. Error code = " << numpy_error << endl;
-#if PY_MAJOR_VERSION >= 3
-    return NULL;
-#else
-    return;
-#endif
-  }
+  import_array();
 
 
-#if PY_MAJOR_VERSION >= 3
   static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
     "_essentia",     /* m_name */
@@ -108,22 +87,12 @@ init_essentia() {
     NULL,                /* m_clear */
     NULL,                /* m_free */
   };
-#endif
 
-#if PY_MAJOR_VERSION >= 3
   Essentia__Module = PyModule_Create(&moduledef);
-#else
-  Essentia__Module = Py_InitModule3("_essentia", Essentia__Methods,
-                                    "Module that allows access to essentia plugins and algorithms.");
-#endif
 
   if (Essentia__Module == NULL) {
     cerr << "Error loading _essentia python/C module" << endl;
-#if PY_MAJOR_VERSION >= 3
     return NULL;
-#else
-    return;
-#endif
   }
 
   // insert the Algorithm class
@@ -143,9 +112,5 @@ init_essentia() {
   essentia::init();
 
   E_DEBUG(EPyBindings, "Successfully initialized _essentia python/C module");
-#if PY_MAJOR_VERSION >= 3
   return Essentia__Module;
-#else
-  return;
-#endif
 }

@@ -61,11 +61,10 @@
 // its own MTRand object)
 
 #include <iostream>
-#include <limits.h>
-#include <stdio.h>
-#include <time.h>
-#include <math.h>
-
+#include <climits>
+#include <cstdio>
+#include <ctime>
+#include <cmath>
 
 class MTRand {
 // Data
@@ -172,8 +171,9 @@ inline double MTRand::randNorm( const double& mean, const double& variance )
 {
 	// Return a real number from a normal (Gaussian) distribution with given
 	// mean and variance by Box-Muller method
+	const double pi = 3.14159265358979323846;
 	double r = sqrt( -2.0 * log( 1.0-randDblExc()) ) * variance;
-	double phi = 2.0 * 3.14159265358979323846264338328 * randExc();
+	double phi = 2.0 * pi * randExc();
 	return mean + r * cos(phi);
 }
 

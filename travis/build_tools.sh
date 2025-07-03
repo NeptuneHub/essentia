@@ -1,23 +1,27 @@
 set -e -x
 
-# yasm on CentOS 5 is too old, install a newer version
-curl -SLO http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
-tar -xvf yasm-1.3.0.tar.gz
-cd yasm-1.3.0
-./configure
-make
-make install
-cd ..
+if ! command -v yasm &> /dev/null || [[ $(yasm --version) != *"1.3.0"* ]]; then
+    # yasm on CentOS 5 is too old, install a newer version
+    # Version 1.3.0 is the latest stable release.
+    curl -SLO http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+    tar -xvf yasm-1.3.0.tar.gz
+    cd yasm-1.3.0
+    ./configure --prefix=/usr/local
+    make
+    make install
+    cd ..
+fi
 
-# cmake is also too old
-# taglib requires CMake 2.8.0, chromaprint requires CMake 2.8.12
-curl -SLO http://www.cmake.org/files/v2.8/cmake-2.8.12.tar.gz
-tar -xvf cmake-2.8.12.tar.gz
-cd cmake-2.8.12
-./configure --prefix=/usr/local/cmake-2.8.12
+# CMake is also too old. Modern C++ projects, especially with TensorFlow,
+# require a much newer version. Let's update to a more recent one (e.g., 3.16.3).
+CMAKE_VERSION="3.16.3"
+curl -SLO "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz"
+tar -xvf "cmake-${CMAKE_VERSION}.tar.gz"
+cd "cmake-${CMAKE_VERSION}"
+./configure --prefix="/usr/local/cmake-${CMAKE_VERSION}"
 make
 make install
-PATH=/usr/local/cmake-2.8.12/bin:$PATH
+export PATH="/usr/local/cmake-${CMAKE_VERSION}/bin:$PATH"
 cd ..
 
 function lex_pyver {

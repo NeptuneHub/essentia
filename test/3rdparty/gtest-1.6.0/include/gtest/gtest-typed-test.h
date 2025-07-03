@@ -238,7 +238,7 @@ INSTANTIATE_TYPED_TEST_CASE_P(My, FooTest, MyTypes);
 
 # define REGISTER_TYPED_TEST_CASE_P(CaseName, ...) \
   namespace GTEST_CASE_NAMESPACE_(CaseName) { \
-  typedef ::testing::internal::Templates<__VA_ARGS__>::type gtest_AllTests_; \
+  typedef typename ::testing::internal::Templates<__VA_ARGS__>::type gtest_AllTests_; \
   } \
   static const char* const GTEST_REGISTERED_TEST_NAMES_(CaseName) = \
       GTEST_TYPED_TEST_CASE_P_STATE_(CaseName).VerifyRegisteredTestNames(\
