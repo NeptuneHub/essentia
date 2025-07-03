@@ -30,6 +30,12 @@ class EssentiaInstall(install_lib):
 class EssentiaBuildExtension(build_ext):
     def run(self):
         global library
+
+        # Create a build environment and add the required CXXFLAGS for modern NumPy
+        build_env = os.environ.copy()
+        cxxflags = build_env.get('CXXFLAGS', '')
+        build_env['CXXFLAGS'] = f'{cxxflags} -DNPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION'
+
         os.system('rm -rf tmp; mkdir tmp')
 
         # Ugly hack using an enviroment variable... There's no way to pass a
@@ -49,13 +55,13 @@ class EssentiaBuildExtension(build_ext):
 
         if var_only_python in os.environ and os.environ[var_only_python]=='1':
             print('Skipping building the core libessentia library (%s=1)' %  var_only_python)
-            subprocess.run([PYTHON,  'waf', 'configure', '--only-python', '--static-dependencies',
-                      '--prefix=tmp'] + macos_arm64_flags, check=True)
+            subprocess.run([PYTHON, 'waf', 'configure', '--only-python', '--static-dependencies',
+                            '--prefix=tmp'] + macos_arm64_flags, check=True, env=build_env)
         else:
-            subprocess.run([PYTHON, 'waf', 'configure', '--build-static', '--static-dependencies'
-                      '--with-python --prefix=tmp'] + macos_arm64_flags, check=True)
-        subprocess.run([PYTHON, 'waf'], check=True)
-        subprocess.run([PYTHON, 'waf', 'install'], check=True)
+            subprocess.run([PYTHON, 'waf', 'configure', '--build-static', '--static-dependencies',
+                            '--with-python', '--prefix=tmp'] + macos_arm64_flags, check=True, env=build_env)
+        subprocess.run([PYTHON, 'waf'], check=True, env=build_env)
+        subprocess.run([PYTHON, 'waf', 'install'], check=True, env=build_env)
 
         library = glob.glob('tmp/lib/python*/*-packages/essentia')[0]
 
