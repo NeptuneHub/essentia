@@ -51,11 +51,11 @@ void* VectorReal::fromPythonRef(PyObject* obj) {
 
   PyArrayObject* array = (PyArrayObject*)obj;
 
-  if (array->descr->type_num != NPY_FLOAT) {
+  if (PyArray_DESCR(array)->type_num != NPY_FLOAT) {
     throw EssentiaException("VectorReal::fromPythonRef: this NumPy array doesn't contain Reals (maybe you forgot dtype='f4')");
   }
-  if (array->nd != 1) {
-    throw EssentiaException("VectorReal::fromPythonRef: this NumPy array has dimension ", array->nd, " (expected 1)");
+  if (PyArray_NDIM(array) != 1) {
+    throw EssentiaException("VectorReal::fromPythonRef: this NumPy array has dimension ", PyArray_NDIM(array), " (expected 1)");
   }
 
   return new RogueVector<Real>((Real*)PyArray_DATA(array), PyArray_SIZE(array));
