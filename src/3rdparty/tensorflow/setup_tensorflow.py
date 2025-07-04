@@ -20,7 +20,7 @@
 
 import argparse
 from os import symlink, remove, makedirs
-from os.path import join, dirname, abspath
+from os.path import join, dirname, abspath, isdir
 from shutil import copytree, rmtree
 from subprocess import call
 
@@ -61,10 +61,10 @@ if __name__ == "__main__":
         major_version = int(version_list[0])
         minor_version = int(version_list[1])
 
-        # From Tensorflow 1.15. libraries are stored in `tensorflow_core`
-        if major_version >= 1:
-            if minor_version >= 15:
-                tf_dir = tf_dir + '_core'
+        # From Tensorflow 1.15 to 2.1, libraries were stored in `tensorflow_core`.
+        # Modern versions (>=2.2) store them in the main `tensorflow` package directory.
+        if isdir(tf_dir + '_core'):
+            tf_dir = tf_dir + '_core'
 
         print('found tensorflow in "{}"'.format(tf_dir))
         print('tensorflow version: {}'.format(version))
