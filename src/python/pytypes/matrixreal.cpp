@@ -78,7 +78,7 @@ void* MatrixReal::fromPythonCopy(PyObject* obj) {
   PyArrayObject* numpyarr = (PyArrayObject*)obj;
 
   for (int i=0; i<int(tntmat->dim1()); ++i) {
-    const Real* src = (Real*)(numpyarr->data + i*numpyarr->strides[0]);
+
     Real* dest = &((*tntmat)[i][0]);
     fastcopy(dest, src, tntmat->dim2());
   }
