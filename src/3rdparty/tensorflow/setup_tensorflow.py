@@ -50,9 +50,9 @@ if __name__ == "__main__":
         try:
             import tensorflow
         except ImportError as error:
-            print(error.__class__.__name__ + ": " + error.message)
-            raise(Exception('tensorflow is not available from this interpreter.\n'
-                            'Suggestion: `pip install tensorflow`'))
+            print("{}: {}".format(error.__class__.__name__, error))
+            raise Exception('tensorflow is not available from this interpreter.\n'
+                            'Suggestion: `pip install tensorflow`')
 
         tf_dir = dirname(tensorflow.__file__)
         version = tensorflow.__version__
