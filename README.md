@@ -1,3 +1,5 @@
+**Edit:** Work in progress in order to deploy a docker container with essentia in it for both Intel/AMD and ARM architecture.
+
 Essentia
 ========
 [![Build wheels status](https://github.com/MTG/essentia/actions/workflows/build-wheels-cibuildwheel.yml/badge.svg)](https://github.com/MTG/essentia/actions/workflows/build-wheels-cibuildwheel.yml)
