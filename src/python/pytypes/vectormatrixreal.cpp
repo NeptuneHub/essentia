@@ -42,7 +42,7 @@ PyObject* VectorMatrixReal::toPythonCopy(const vector<TNT::Array2D<Real> >* matV
     // w/o the following check, will crash
     if (dims[1] != 0) {
       for (int j=0; j<dims[0]; ++j) {
-        Real* dest = (Real*)(mat->data + j*mat->strides[0]);
+        Real* dest = (Real*)((char*)PyArray_DATA(mat) + j*PyArray_STRIDES(mat)[0]);
         const Real* src = &((*matVec)[i][j][0]);
         fastcopy(dest, src, dims[1]);
       }

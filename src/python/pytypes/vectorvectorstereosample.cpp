@@ -45,7 +45,7 @@ PyObject* VectorVectorStereoSample::toPythonCopy(const vector<vector<StereoSampl
 
     for (int i=0; i<dims[0]; i++) {
       for (int j=0; j<dims[1]; j++) {
-        PyObject** ptr = (PyObject**)(result->data + i*result->strides[0] + j*result->strides[1]);
+        PyObject** ptr = (PyObject**)((char*)PyArray_DATA(result) + i*PyArray_STRIDES(result)[0] + j*PyArray_STRIDES(result)[1]);
         *ptr = PyStereoSample::toPythonCopy(&((*v)[i][j]));
       }
     }

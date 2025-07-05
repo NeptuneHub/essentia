@@ -37,11 +37,9 @@ PyObject* TensorReal::toPythonCopy(const essentia::Tensor<essentia::Real>* tenso
 
   result = PyArray_SimpleNew(nd, dims, NPY_FLOAT);
 
-  Real* dest = (Real*)(((PyArrayObject*)result)->data);
+  Real* dest = (Real*)PyArray_DATA((PyArrayObject*)result);
   const Real* src = tensor->data();
   fastcopy(dest, src, tensor->size());
-
-  assert(result->strides[3] == sizeof(Real));
 
   if (result == NULL) {
     throw EssentiaException("TensorReal: dang null object");
@@ -61,7 +59,7 @@ void* TensorReal::fromPythonCopy(PyObject* obj) {
 
   // // copy data from numpy array to matrix
   PyArrayObject* numpyarr = (PyArrayObject*)obj;
-  if (numpyarr->descr->type_num != NPY_FLOAT) {
+  if (PyArray_DESCR(numpyarr)->type_num != NPY_FLOAT) {
      throw EssentiaException("TensorReal::fromPythonRef: this NumPy array doesn't contain Reals (maybe you forgot dtype='f4')");
    }
 

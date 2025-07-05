@@ -53,11 +53,11 @@ void* VectorComplex::fromPythonRef(PyObject* obj) {
 
   PyArrayObject* array = (PyArrayObject*)obj;
 
-  if (array->descr->type_num != NPY_CFLOAT) {
+  if (PyArray_DESCR(array)->type_num != NPY_CFLOAT) {
     throw EssentiaException("VectorComplex::fromPythonRef: this NumPy array doesn't contain complex<Real> (maybe you forgot dtype='c8')");
   }
-  if (array->nd != 1) {
-    throw EssentiaException("VectorComplex::fromPythonRef: this NumPy array has dimension ", array->nd, " (expected 1)");
+  if (PyArray_NDIM(array) != 1) {
+    throw EssentiaException("VectorComplex::fromPythonRef: this NumPy array has dimension ", PyArray_NDIM(array), " (expected 1)");
   }
 
   return new RogueVector<complex<Real> >((complex<Real>*)PyArray_DATA(array), PyArray_SIZE(array));

@@ -51,11 +51,11 @@ void* VectorInteger::fromPythonRef(PyObject* obj) {
 
   PyArrayObject* array = (PyArrayObject*)obj;
 
-  if (array->descr->type_num != NPY_INT32) {
-    throw EssentiaException("VectorInteger::fromPythonRef: this NumPy array doesn't contain ints (maybe you forgot dtype='int'), type code: ", array->descr->type_num);
+  if (PyArray_DESCR(array)->type_num != NPY_INT32) {
+    throw EssentiaException("VectorInteger::fromPythonRef: this NumPy array doesn't contain ints (maybe you forgot dtype='int'), type code: ", PyArray_DESCR(array)->type_num);
   }
-  if (array->nd != 1) {
-    throw EssentiaException("VectorInteger::fromPythonRef: this NumPy array has dimension ", array->nd, " (expected 1)");
+  if (PyArray_NDIM(array) != 1) {
+    throw EssentiaException("VectorInteger::fromPythonRef: this NumPy array has dimension ", PyArray_NDIM(array), " (expected 1)");
   }
 
   return new RogueVector<int>((int*)PyArray_DATA(array), PyArray_SIZE(array));

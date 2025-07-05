@@ -45,7 +45,7 @@ PyObject* VectorTensorReal::toPythonCopy(const vector<Tensor<Real> >* tenVec) {
       throw EssentiaException("VectorTensorReal::toPythonCopy: dang null object");
     }
 
-    Real* dest = (Real*)numpyarr->data;
+    Real* dest = (Real*)PyArray_DATA(numpyarr);
     const Real* src = tensor.data();
     fastcopy(dest, src, tensor.size());
 

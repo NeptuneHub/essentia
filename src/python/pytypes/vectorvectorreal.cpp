@@ -41,14 +41,14 @@ PyObject* VectorVectorReal::toPythonCopy(const vector<vector<Real> >* v) {
     PyArrayObject* result;
 
     result = (PyArrayObject*)PyArray_SimpleNew(2, dims, NPY_FLOAT);
-    assert(result->strides[1] == sizeof(Real));
+    assert(PyArray_STRIDES(result)[1] == sizeof(Real));
 
     if (result == NULL) {
       throw EssentiaException("VectorVectorReal: dang null object");
     }
 
     for (int i=0; i<dims[0]; i++) {
-      Real* dest = (Real*)(result->data + i*result->strides[0]);
+      Real* dest = (Real*)((char*)PyArray_DATA(result) + i*PyArray_STRIDES(result)[0]);
       const Real* src = &((*v)[i][0]);
       fastcopy(dest, src, dims[1]);
     }
@@ -62,12 +62,12 @@ PyObject* VectorVectorReal::toPythonCopy(const vector<vector<Real> >* v) {
   for (int i=0; i<(int)v->size(); ++i) {
     npy_intp itemDims[1] = {(int)(*v)[i].size()};
     PyArrayObject* item = (PyArrayObject*)PyArray_SimpleNew(1, itemDims, NPY_FLOAT);
-    assert(item->strides[0] == sizeof(Real));
+    assert(PyArray_STRIDES(item)[0] == sizeof(Real));
     if (item == NULL) {
       throw EssentiaException("VectorVectorReal: dang null object (list of numpy arrays)");
     }
 
-    Real* dest = (Real*)(item->data);
+    Real* dest = (Real*)PyArray_DATA(item);
     const Real* src = &((*v)[i][0]);
     fastcopy(dest, src, itemDims[0]);
 
@@ -125,13 +125,13 @@ void* VectorVectorReal::fromPythonCopy(PyObject* obj) {
       if (array == NULL) {
         throw EssentiaException("VectorVectorReal::fromPythonCopy: dang null object (list of numpy arrays)");
       }
-      if (array->descr->type_num != NPY_FLOAT) {
+      if (PyArray_DESCR(array)->type_num != NPY_FLOAT) {
         throw EssentiaException("VectorVectorReal::fromPythonCopy: this NumPy array doesn't contain Reals (maybe you forgot dtype='f4')");
       }
-      assert(array->strides[0] == sizeof(Real));
-      npy_intp rowsize = array->dimensions[0];
+      assert(PyArray_STRIDES(array)[0] == sizeof(Real));
+      npy_intp rowsize = PyArray_DIMS(array)[0];
       (*v)[i].resize(rowsize);
-      const Real* src = (Real*)(array->data);
+      const Real* src = (Real*)PyArray_DATA(array);
       Real* dest = &((*v)[i][0]);
       fastcopy(dest, src, rowsize);
     }
