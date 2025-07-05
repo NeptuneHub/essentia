@@ -18,6 +18,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # --- New Step to Lowercase the Repository Name ---
+      - name: Set lowercased repository name
+        id: repo
+        run: echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -38,9 +43,10 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
+          # --- Use the new lowercased name from the step above ---
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ steps.repo.outputs.name }}:latest
+            ghcr.io/${{ steps.repo.outputs.name }}:${{ github.sha }}
 
   test-container:
     needs: build-and-push
@@ -49,6 +55,11 @@ jobs:
       matrix:
         platform: [linux/amd64, linux/arm64]
     steps:
+      # --- New Step to Lowercase the Repository Name ---
+      - name: Set lowercased repository name
+        id: repo
+        run: echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -61,5 +72,5 @@ jobs:
 
       - name: Run container and test library imports
         run: |
-          docker run --rm --platform ${{ matrix.platform }} ghcr.io/${{ github.repository }}:${{ github.sha }} \
+          docker run --rm --platform ${{ matrix.platform }} ghcr.io/${{ steps.repo.outputs.name }}:${{ github.sha }} \
           python3 -c "import essentia; import tensorflow; print('✅ Essentia and TensorFlow imported successfully on ${{ matrix.platform }}')"
